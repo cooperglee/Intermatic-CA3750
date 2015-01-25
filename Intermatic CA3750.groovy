@@ -26,6 +26,9 @@ metadata {
 		attribute "switch3", "string"
 
 		attribute "Mode", "string"
+		
+		attribute "level1", "string"
+		attribute "level2", "string"
 
 
 		command "on"
@@ -35,6 +38,10 @@ metadata {
 		command "off1"
 		command "on2"
 		command "off2"
+		
+		command "setLevel1"
+		command "setLevel2"
+		command "setLevelX"
 
 }
 	simulator {
