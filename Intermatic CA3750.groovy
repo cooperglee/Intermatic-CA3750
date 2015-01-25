@@ -56,10 +56,14 @@ metadata {
                         state "on", label: "switch2", action: "off2", icon: "st.switches.switch.on", backgroundColor: "#79b821"
                         state "off", label: "switch2", action: "on2", icon: "st.switches.switch.off", backgroundColor: "#ffffff"
                 }
-        standardTile("switch3", "device.switch3",canChangeIcon: false) {
-                        state "on", label: "switch3", action: "off3", icon: "st.switches.switch.on", backgroundColor: "#79b821"
-                        state "off", label: "switch3", action:"on3", icon: "st.switches.switch.off", backgroundColor: "#ffffff"
+
+        standardTile("switch2on", "device.switch2",canChangeIcon: false) {
+                        state "on", label: "sw2 on", action: "off2", icon: "st.switches.switch.on", backgroundColor: "#79b821"
                 }
+        standardTile("switch2off", "device.switch2",canChangeIcon: false) {
+                        state "off", label: "sw2 off", action:"on2", icon: "st.switches.switch.off", backgroundColor: "#ffffff"
+                }
+
 
 		controlTile("levelSliderControl", "device.level", "slider", height: 1, width: 3, inactiveLabel: false) {
 			state "level", action:"switch level.setLevel"
@@ -73,7 +77,11 @@ metadata {
 			state "level", action:"switch level.setLevel2"
 		}
         standardTile("configure", "device.switch", inactiveLabel: false, decoration: "flat") {
-        				state "default", label:"", action:"configuration.configure", icon:"st.secondary.configure"
+        				state "default", label:"", action:"configure", icon:"st.secondary.configure"
+                }
+
+        standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat") {
+                        state "default", label:"", action:"refresh", icon:"st.secondary.refresh"
                 }
 
 
