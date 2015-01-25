@@ -112,7 +112,7 @@ metadata {
 
 def parse(String description) {
     def results = []
-    def cmd = zwave.parse(description, [0x60:1, 0x25:1, 0x32:1, 0x70:1 , 0x72:2, 0x73:1, 0x91:1 ])
+    def cmd = zwave.parse(description, [0x60:1, 0x25:1, 0x32:1, 0x70:1 , 0x72:1, 0x73:1, 0x91:1 ])
     if (cmd) { results = createEvent(zwaveEvent(cmd)) }
     return results
 }
@@ -193,9 +193,9 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.multiinstancev1.MultiInstanceCmdEncap cmd) {
-    log.debug "Miv1 $cmd"
+    log.debug "Miv1 $cmd - $cmd?.instance"
 
-    def map = [ name: "switch$cmd.sourceEndPoint" ]
+    def map = [ name: "switch$cmd.instance" ]
     if (cmd.commandClass == 37){
     	if (cmd.parameter == [0]) {
         	map.value = "off"
@@ -217,6 +217,12 @@ def zwaveEvent(physicalgraph.zwave.commands.multiinstancev1.MultiInstanceCmdEnca
 def zwaveEvent(physicalgraph.zwave.commands.multiinstancev1.MultiInstanceReport cmd) {
     log.debug "mi v1 report $cmd"
 }
+
+
+def zwaveEvent(physicalgraph.zwave.commands.manufacturerspecificv1.ManufacturerSpecificReport cmd) {
+    log.debug "mi v1 report $cmd"
+}
+
 
 def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCapabilityReport cmd) {
     log.debug "mc v3 report $cmd"
@@ -313,11 +319,8 @@ def swOn(port) {
 	log.debug "<FONT COLOR=GREEN>Port $port On Digital</FONT>"
 
 	delayBetween([
-        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port, commandClass:37, command:1, parameter:[255]).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port, commandClass:37, command:2, parameter:[0]).format(),
-        "delay 1200",
-        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[16]).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[0]).format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:port, commandClass:37, command:1, parameter:[255]).format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:port, commandClass:37, command:2, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
@@ -326,11 +329,8 @@ def swOff(port) {
 	log.debug "<FONT COLOR=GREEN>Port $port Off Digital</FONT>"
 
 	delayBetween([
-        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port, commandClass:37, command:1, parameter:[0]).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port, commandClass:37, command:2, parameter:[0]).format(),
-        "delay 1200",
-        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[16]).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[0]).format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:port, commandClass:37, command:1, parameter:[0]).format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:port, commandClass:37, command:2, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
