@@ -193,7 +193,7 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.multiinstancev1.MultiInstanceCmdEncap cmd) {
-    log.debug "Miv1 $cmd - $cmd?.instance"
+    log.debug "Miv1 $cmd - $cmd?.instance - $cmd?.commandClass"
 
     def map = [ name: "switch$cmd.instance" ]
     if (cmd.commandClass == 37){
