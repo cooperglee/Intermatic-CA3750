@@ -266,7 +266,8 @@ def poll() {
 	delayBetween([
 		zwave.switchBinaryV1.switchBinaryGet().format(),
 		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet().format()		
+		zwave.multiInstanceV1.multiInstanceGet().format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:port, commandClass:37, command:2, parameter:[0]).format(),
 	])
 }
 
@@ -275,7 +276,8 @@ def refresh() {
 	delayBetween([
 		zwave.switchBinaryV1.switchBinaryGet().format(),
 		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet().format()		
+		zwave.multiInstanceV1.multiInstanceGet().format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:port, commandClass:37, command:2, parameter:[0]).format(),
 	])
 }
 
@@ -293,22 +295,16 @@ def on4() { swOn(4) }; def off4() { swOff(4) }
 def on1() {
     	delayBetween([
 		//zwave.switchAllV1.switchAllSet(mode:0).format(),
-        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:1, commandClass:37, command:1, parameter:[255]).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:1, commandClass:37, command:2).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:2, commandClass:37, command:2).format(),
-        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:3, commandClass:50, command:1, parameter:[0]).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:3, commandClass:50, command:1, parameter:[16]).format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:1, commandClass:37, command:1, parameter:[255]).format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:1, commandClass:37, command:2, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
 
 def off1() {
     	delayBetween([
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:1, commandClass:37, command:1, parameter:[0]).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:1, commandClass:37, command:2).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:2, commandClass:37, command:2).format(),
-        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:3, commandClass:50, command:1, parameter:[0]).format(),
-		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:3, commandClass:50, command:1, parameter:[16]).format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:1, commandClass:37, command:1, parameter:[0]).format(),
+        zwave.multiInstanceV1.MultiInstanceCmdEncap(instance:1, commandClass:37, command:2, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
