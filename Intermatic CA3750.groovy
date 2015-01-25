@@ -118,7 +118,7 @@ def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicReport cmd) {
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd) {
-    log.debug "Strip BINARY (all on/off or button) - $cmd ${cmd?.value}"
+    log.debug "Switch BINARY (all on/off or button) - $cmd ${cmd?.value}"
     def map = []; def value
     if(cmd.value==255) { value="on" } else { value="off" }
     map = [name: "switch", value:value, type: "digital"]
@@ -205,13 +205,15 @@ def testing (cmd){
 	log.debug "testing $current"
 }
 def on() {
-	delayBetween([
+	log.debug "<FONT COLOR=GREEN>On Digital</FONT>"
+    delayBetween([
 		zwave.basicV1.basicSet(value: 0xFF).format(),
 		zwave.switchBinaryV1.switchBinaryGet().format()
 	])
 }
 
 def off() {
+	log.debug "<FONT COLOR=GREEN>Off Digital</FONT>"
 	delayBetween([
 		zwave.basicV1.basicSet(value: 0x00).format(),
 		zwave.switchBinaryV1.switchBinaryGet().format()
@@ -219,6 +221,7 @@ def off() {
 }
 
 def poll() {
+	log.debug "<FONT COLOR=RED>Polling Switch - $device.label</FONT>"
 	delayBetween([
 		zwave.switchBinaryV1.switchBinaryGet().format(),
 		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format()
@@ -226,6 +229,7 @@ def poll() {
 }
 
 def refresh() {
+	log.debug "<FONT COLOR=BLUE>Refresh requested $device.label</FONT>"
 	delayBetween([
 		zwave.switchBinaryV1.switchBinaryGet().format(),
 		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format()
@@ -267,6 +271,8 @@ def off1() {
 
 
 def swOn(port) {
+	log.debug "<FONT COLOR=GREEN>Port $port On Digital</FONT>"
+
 	delayBetween([
         zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port, commandClass:37, command:1, parameter:[255]).format(),
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port, commandClass:37, command:2, parameter:[0]).format(),
@@ -277,6 +283,8 @@ def swOn(port) {
 }
 
 def swOff(port) {
+	log.debug "<FONT COLOR=GREEN>Port $port Off Digital</FONT>"
+
 	delayBetween([
         zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port, commandClass:37, command:1, parameter:[0]).format(),
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port, commandClass:37, command:2, parameter:[0]).format(),
@@ -293,6 +301,9 @@ def setLevelX(port, value) {
 }
 
 def setLevel(value) {
+
+	log.debug "<FONT COLOR=GREEN>SetLevel $value Off Digital</FONT>"
+
     def level = Math.min(value as Integer, 99)
 	delayBetween ([zwave.basicV1.basicSet(value: level).format(), zwave.switchMultilevelV1.switchMultilevelGet().format()], 5000)
 }
