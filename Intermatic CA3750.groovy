@@ -9,7 +9,7 @@
 
 metadata {
 	// Automatically generated. Make future change here.
-	definition (name: "Intermatic CA3750-2", namespace: "research", author: "Cooper Lee") {
+	definition (name: "Intermatic CA3750", namespace: "research", author: "Cooper Lee") {
 		capability "Actuator"
 		capability "Indicator"
 		capability "Switch"
@@ -86,6 +86,8 @@ metadata {
 //0 0 0x1001 0 0 0 7 0x91 0x73 0x72 0x86 0x60 0x25 0x27
 //Intermatic CA3750
 
+//0x72 
+//0x91 
 // 0x25: switch binary
 // 0x32: meter
 // 0x27: switch all
@@ -192,7 +194,7 @@ def zwaveEvent(physicalgraph.zwave.commands.configurationv1.ConfigurationReport 
 }
 
 def zwaveEvent(physicalgraph.zwave.Command cmd) {
-        // Handles all Z-Wave commands we arent interested in
+        // Handles all Z-Wave commands we arent interested in 
         [:]
     log.debug "Capture All $cmd"
 }
@@ -273,6 +275,17 @@ def swOn(port) {
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[0]).format(),
 	])
 }
+
+def swOff(port) {
+	delayBetween([
+        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port, commandClass:37, command:1, parameter:[0]).format(),
+		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port, commandClass:37, command:2, parameter:[0]).format(),
+        "delay 1200",
+        zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[16]).format(),
+		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[0]).format(),
+	])
+}
+
 
 def setLevelX(port, value) {
     def level = Math.min(value as Integer, 99)
