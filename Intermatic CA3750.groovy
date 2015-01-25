@@ -110,7 +110,7 @@ def parse(String description) {
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicReport cmd) {
-//    log.debug "Strip (or sw1) Basic - $cmd ${cmd?.value}"
+    log.debug "Strip (or sw1) Basic - $cmd ${cmd?.value}"
     def map = []; def value;
     if(cmd.value==255) { value="on" } else { value="off" }
     map = [name: "switch", value:value, type: "digital"]
@@ -127,7 +127,7 @@ def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinaryReport cm
 
 
 def zwaveEvent(physicalgraph.zwave.commands.switchallv1.SwitchAllReport cmd) {
-//    log.debug "Switch All - $cmd ${cmd?.mode}"
+    log.debug "Switch All - $cmd ${cmd?.mode}"
     def value
     if(cmd.mode==255) { value="on" } else { value="off" }
     return [name:"Mode", value:value]
@@ -135,7 +135,7 @@ def zwaveEvent(physicalgraph.zwave.commands.switchallv1.SwitchAllReport cmd) {
 
 
 def zwaveEvent(physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
-//	log.debug "Standard v1 Meter Report $cmd"
+	log.debug "Standard v1 Meter Report $cmd"
     def map = []
 
 	if (cmd.scale == 0) {
@@ -149,7 +149,7 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
 }
 
 def zwaveEvent(int endPoint, physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
-//	 log.debug "V1 Report EndPoint $endPoint, MeterReport $cmd  scale ${cmd?.scale}"
+	 log.debug "V1 Report EndPoint $endPoint, MeterReport $cmd  scale ${cmd?.scale}"
     def map = []
 
     if (cmd?.scale == 0) {
@@ -163,7 +163,7 @@ def zwaveEvent(int endPoint, physicalgraph.zwave.commands.meterv1.MeterReport cm
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap cmd) {
-//    log.debug "Mv3 $cmd"
+    log.debug "Mv3 $cmd"
 
     def map = [ name: "switch$cmd.sourceEndPoint" ]
     if (cmd.commandClass == 37){
@@ -179,13 +179,13 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
     else if (cmd.commandClass == 50) {
         def hex1 = { n -> String.format("%02X", n) }
         def desc = "command: ${hex1(cmd.commandClass)}${hex1(cmd.command)}, payload: " + cmd.parameter.collect{hex1(it)}.join(" ")
-        //log.debug "ReParse command as specifc endpoint"
+        log.debug "ReParse command as specifc endpoint"
         zwaveEvent(cmd.sourceEndPoint, zwave.parse(desc, [ 0x25:1, 0x32:1, 0x70:1 , 0x72:2, 0x73:1 ]))
     }
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCapabilityReport cmd) {
-//	  [50, 37, 32], dynamic: false, endPoint: 1, genericDeviceClass: 16, specificDeviceClass: 1)
+	  [50, 37, 32], dynamic: false, endPoint: 1, genericDeviceClass: 16, specificDeviceClass: 1)
     log.debug "mc v3 report $cmd"
 }
 
