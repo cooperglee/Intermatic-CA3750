@@ -112,7 +112,7 @@ metadata {
 
 def parse(String description) {
     def results = []
-    def cmd = zwave.parse(description, [0x60:3, 0x25:1, 0x32:1, 0x70:1 , 0x72:2, 0x73:1, 0x91:1 ])
+    def cmd = zwave.parse(description, [0x60:1, 0x25:1, 0x32:1, 0x70:1 , 0x72:2, 0x73:1, 0x91:1 ])
     if (cmd) { results = createEvent(zwaveEvent(cmd)) }
     return results
 }
@@ -192,8 +192,33 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
     }
 }
 
+def zwaveEvent(physicalgraph.zwave.commands.multiinstancev1.MultiInstanceCmdEncap cmd) {
+    log.debug "Miv1 $cmd"
+
+    def map = [ name: "switch$cmd.sourceEndPoint" ]
+    if (cmd.commandClass == 37){
+    	if (cmd.parameter == [0]) {
+        	map.value = "off"
+        }
+        if (cmd.parameter == [255]) {
+            map.value = "on"
+        	sendEvent(name:"switch", value:"on", displayed:false)
+        }
+        map
+    }
+    else if (cmd.commandClass == 50) {
+        def hex1 = { n -> String.format("%02X", n) }
+        def desc = "command: ${hex1(cmd.commandClass)}${hex1(cmd.command)}, payload: " + cmd.parameter.collect{hex1(it)}.join(" ")
+        //log.debug "ReParse command as specifc endpoint"
+        zwaveEvent(cmd.sourceEndPoint, zwave.parse(desc, [ 0x25:1, 0x32:1, 0x70:1 , 0x72:2, 0x73:1 ]))
+    }
+}
+
+def zwaveEvent(physicalgraph.zwave.commands.multiinstancev1.MultiInstanceReport cmd) {
+    log.debug "mi v1 report $cmd"
+}
+
 def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCapabilityReport cmd) {
-//	  [50, 37, 32], dynamic: false, endPoint: 1, genericDeviceClass: 16, specificDeviceClass: 1)
     log.debug "mc v3 report $cmd"
 }
 
@@ -216,7 +241,8 @@ def on() {
 	log.debug "<FONT COLOR=GREEN>On Digital</FONT>"
     delayBetween([
 		zwave.basicV1.basicSet(value: 0xFF).format(),
-		zwave.switchBinaryV1.switchBinaryGet().format()
+		zwave.switchBinaryV1.switchBinaryGet().format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
 
@@ -224,7 +250,8 @@ def off() {
 	log.debug "<FONT COLOR=GREEN>Off Digital</FONT>"
 	delayBetween([
 		zwave.basicV1.basicSet(value: 0x00).format(),
-		zwave.switchBinaryV1.switchBinaryGet().format()
+		zwave.switchBinaryV1.switchBinaryGet().format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
 
@@ -232,7 +259,8 @@ def poll() {
 	log.debug "<FONT COLOR=RED>Polling Switch - $device.label</FONT>"
 	delayBetween([
 		zwave.switchBinaryV1.switchBinaryGet().format(),
-		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format()
+		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format(),
+		zwave.multiInstanceV1.multiInstanceGet().format()		
 	])
 }
 
@@ -240,7 +268,8 @@ def refresh() {
 	log.debug "<FONT COLOR=BLUE>Refresh requested $device.label</FONT>"
 	delayBetween([
 		zwave.switchBinaryV1.switchBinaryGet().format(),
-		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format()
+		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format(),
+		zwave.multiInstanceV1.multiInstanceGet().format()		
 	])
 }
 
@@ -263,6 +292,7 @@ def on1() {
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:2, commandClass:37, command:2).format(),
         zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:3, commandClass:50, command:1, parameter:[0]).format(),
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:3, commandClass:50, command:1, parameter:[16]).format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
 
@@ -273,6 +303,7 @@ def off1() {
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:2, commandClass:37, command:2).format(),
         zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:3, commandClass:50, command:1, parameter:[0]).format(),
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:1, destinationEndPoint:3, commandClass:50, command:1, parameter:[16]).format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
 
@@ -287,6 +318,7 @@ def swOn(port) {
         "delay 1200",
         zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[16]).format(),
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:0, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[0]).format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
 
@@ -299,6 +331,7 @@ def swOff(port) {
         "delay 1200",
         zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[16]).format(),
 		zwave.multiChannelV3.multiChannelCmdEncap(sourceEndPoint:3, destinationEndPoint:port+2, commandClass:50, command:1, parameter:[0]).format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
 
@@ -329,7 +362,8 @@ def configure() {
     if(switchAll=="true") { switchAllmode = 255 } else { switchAllmode=0 }
     log.debug "SW All - $switchAllmode $switchAll"
     delayBetween([
-    	zwave.configurationV1.configurationSet(parameterNumber:101, size:4, configurationValue: [ 0, 0, 127, 127 ]).format(),
+    	zwave.multiInstanceV1.multiInstanceGet().format(),
+		zwave.configurationV1.configurationSet(parameterNumber:101, size:4, configurationValue: [ 0, 0, 127, 127 ]).format(),
         zwave.configurationV1.configurationSet(parameterNumber:111, size:4, scaledConfigurationValue: 15).format(),
         zwave.configurationV1.configurationSet(parameterNumber:112, size:4, scaledConfigurationValue: 15).format(),
         zwave.configurationV1.configurationSet(parameterNumber:113, size:4, scaledConfigurationValue: 15).format(),
