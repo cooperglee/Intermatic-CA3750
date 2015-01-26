@@ -87,7 +87,7 @@ metadata {
 
 
 		main "switch"
-		details(["switch","switch1","switch2","switch3","level","levelSliderControl1","levelSliderControl2","configure","refresh"])
+		details(["switch","switch1","switch2","switch3","switch2on", "switch2off","levelSliderControl","configure","refresh"])
 	}
 }
 
