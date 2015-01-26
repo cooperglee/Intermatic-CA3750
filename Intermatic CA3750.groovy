@@ -9,7 +9,7 @@
 
 metadata {
 	// Automatically generated. Make future change here.
-	definition (name: "Intermatic CA3750", namespace: "research", author: "Cooper Lee") {
+	definition (name: "Intermatic CA3750", namespace: "research2", author: "Cooper Lee") {
 		capability "Actuator"
 		capability "Indicator"
 		capability "Switch"
