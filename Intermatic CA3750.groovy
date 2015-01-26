@@ -249,7 +249,6 @@ def on() {
 		zwave.basicV1.basicSet(value: 0xFF).format(),
 		zwave.switchBinaryV1.switchBinaryGet().format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
 	])
 }
 
@@ -259,7 +258,6 @@ def off() {
 		zwave.basicV1.basicSet(value: 0x00).format(),
 		zwave.switchBinaryV1.switchBinaryGet().format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
 	])
 }
 
@@ -268,8 +266,6 @@ def poll() {
 	delayBetween([
 		zwave.switchBinaryV1.switchBinaryGet().format(),
 		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0]).format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
    		zwave.multiInstanceV1.multiInstanceGet().format(),
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:37, command:2, parameter:[0]).format(),
 	])
@@ -280,8 +276,6 @@ def refresh() {
 	delayBetween([
 		zwave.switchBinaryV1.switchBinaryGet().format(),
 		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0]).format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
 		zwave.multiInstanceV1.multiInstanceGet().format(),
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:37, command:2, parameter:[0]).format(),
 	])
@@ -304,9 +298,7 @@ def on1() {
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:1, parameter:[255]).format(),
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:2, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0]).format(),
 
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
 	])
 }
 
@@ -315,9 +307,6 @@ def off1() {
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:1, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:2, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0]).format(),
-
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
 	])
 }
 
@@ -330,7 +319,6 @@ def swOn(port) {
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:0, command:1, parameter:[255]).format(),
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:0, command:2, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
 
 	])
 }
@@ -342,7 +330,6 @@ def swOff(port) {
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:0, command:1, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:0, command:2, parameter:[0]).format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
 
 	])
 }
@@ -383,9 +370,6 @@ def configure() {
         zwave.configurationV1.configurationSet(parameterNumber:4, configurationValue: [0]).format(),
         zwave.switchAllV1.switchAllSet(mode:switchAllmode).format(),
         zwave.configurationV1.configurationGet().format(),
-		zwave.multiInstanceV1.multiInstanceGet(instances:[0,1]).format(),
-
-
     ])
 }
 
