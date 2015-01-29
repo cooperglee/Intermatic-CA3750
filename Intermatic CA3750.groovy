@@ -267,7 +267,11 @@ def poll() {
 		zwave.switchBinaryV1.switchBinaryGet().format(),
 		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format(),
    		zwave.multiInstanceV1.multiInstanceGet().format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:37, command:2, parameter:[0]).format(),
+        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:37, command:2, parameter:[0]).format(),
+        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:1, commandClass:37, command:2, parameter:[0]).format(),
+        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:2, parameter:[0]).format(),
+        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:1, commandClass:0, command:2, parameter:[0]).format(),
+
 	])
 }
 
