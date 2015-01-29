@@ -292,7 +292,7 @@ def indicatorWhenOn() {
 
 def setlevel1(value) { setleveX(1, value) }; def setlevel2(value) { setlevelX(2, value) }
 //def on1() { swOn(1) }; def off1() { swOff(1) }
-def on2() { swOn(2) }; def off2() { swOff(2) }
+def on2() { swOn(1) }; def off2() { swOff(1) }
 def on3() { swOn(3) }; def off3() { swOff(3) }
 def on4() { swOn(4) }; def off4() { swOff(4) }
 
