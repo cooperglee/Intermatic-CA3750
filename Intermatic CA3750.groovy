@@ -121,15 +121,15 @@ def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicReport cmd) {
 //    log.debug "Strip (or sw1) Basic - $cmd ${cmd?.value}"
     def map = []; def value;
     if(cmd.value==255) { value="on" } else { value="off" }
-    map = [name: "switch", value:value, type: "digital"]
+    map = [name: "switch1", value:value, type: "digital"]
 	map
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.switchbinaryv1.SwitchBinaryReport cmd) {
-    log.debug "Switch BINARY (all on/off or button) - $cmd ${cmd?.value}"
+    log.debug "Switch BINARY (button) - $cmd ${cmd?.value} "
     def map = []; def value
     if(cmd.value==255) { value="on" } else { value="off" }
-    map = [name: "switch", value:value, type: "digital"]
+    map = [name: "switch1", value:value, type: "digital"]
 	map
 }
 
@@ -138,26 +138,12 @@ def zwaveEvent(physicalgraph.zwave.commands.switchallv1.SwitchAllReport cmd) {
 //    log.debug "Switch All - $cmd ${cmd?.mode}"
     def value
     if(cmd.mode==255) { value="on" } else { value="off" }
-    return [name:"Mode", value:value]
+    return [name:"switch", value:value]
 }
 
-
-def zwaveEvent(physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
-//	log.debug "Standard v1 Meter Report $cmd"
-    def map = []
-
-	if (cmd.scale == 0) {
-    	map = [ name: "energy", value: cmd.scaledMeterValue, unit: "kWh" ]
-    }
-    else if (cmd.scale == 2) {
-    	map = [ name: "power", value: Math.round(cmd.scaledMeterValue), unit: "W" ]
-    }
-
-    map
-}
 
 def zwaveEvent(int endPoint, physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
-//	 log.debug "V1 Report EndPoint $endPoint, MeterReport $cmd  scale ${cmd?.scale}"
+	 log.debug "V1 Report EndPoint $endPoint, MeterReport $cmd  scale ${cmd?.scale}"
     def map = []
 
     if (cmd?.scale == 0) {
@@ -215,12 +201,12 @@ def zwaveEvent(physicalgraph.zwave.commands.multiinstancev1.MultiInstanceCmdEnca
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.multiinstancev1.MultiInstanceReport cmd) {
-    log.debug "mi v1 report $cmd"
+    log.debug "mi v1 report $cmd - $cmd?.instance - $cmd?.commandClass"
 }
 
 
 def zwaveEvent(physicalgraph.zwave.commands.manufacturerspecificv1.ManufacturerSpecificReport cmd) {
-    log.debug "mi v1 report $cmd"
+    log.debug "mi v1 specific report $cmd - $cmd?.instance - $cmd?.commandClass"
 }
 
 
@@ -239,27 +225,6 @@ def zwaveEvent(physicalgraph.zwave.Command cmd) {
 }
 
 
-def testing (cmd){
-
-	log.debug "testing $current"
-}
-def on() {
-	log.debug "<FONT COLOR=GREEN>On Digital</FONT>"
-    delayBetween([
-		zwave.basicV1.basicSet(value: 0xFF).format(),
-		zwave.switchBinaryV1.switchBinaryGet().format(),
-        zwave.multiInstanceV1.multiInstanceGet().format(),
-	])
-}
-
-def off() {
-	log.debug "<FONT COLOR=GREEN>Off Digital</FONT>"
-	delayBetween([
-		zwave.basicV1.basicSet(value: 0x00).format(),
-		zwave.switchBinaryV1.switchBinaryGet().format(),
-        zwave.multiInstanceV1.multiInstanceGet().format(),
-	])
-}
 
 def poll() {
 	log.debug "<FONT COLOR=RED>Polling Switch - $device.label</FONT>"
@@ -267,11 +232,6 @@ def poll() {
 		zwave.switchBinaryV1.switchBinaryGet().format(),
 		zwave.manufacturerSpecificV1.manufacturerSpecificGet().format(),
    		zwave.multiInstanceV1.multiInstanceGet().format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:37, command:2, parameter:[0]).format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:1, commandClass:37, command:2, parameter:[0]).format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:2, parameter:[0]).format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:1, commandClass:0, command:2, parameter:[0]).format(),
-
 	])
 }
 
@@ -292,51 +252,99 @@ def indicatorWhenOn() {
 
 def setlevel1(value) { setleveX(1, value) }; def setlevel2(value) { setlevelX(2, value) }
 //def on1() { swOn(1) }; def off1() { swOff(1) }
-def on2() { swOn(1) }; def off2() { swOff(1) }
+//def on2() { swOn(1) }; def off2() { swOff(1) }
 def on3() { swOn(3) }; def off3() { swOff(3) }
 def on4() { swOn(4) }; def off4() { swOff(4) }
 
+def on() {
+	log.debug "<FONT COLOR=GREEN>On Digital</FONT>"
+    delayBetween([
+		zwave.switchAllV1.switchAllOn().format(),
+		zwave.switchAllV1.switchAllGet().format(),
+		zwave.basicV1.basicSet(value: 0xFF).format(),
+		zwave.switchBinaryV1.switchBinaryGet().format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),
+	])
+}
+
+def off() {
+	log.debug "<FONT COLOR=GREEN>Off Digital</FONT>"
+	delayBetween([
+		zwave.switchAllV1.switchAllOff().format(),
+		zwave.switchAllV1.switchAllGet().format(),
+		zwave.basicV1.basicSet(value: 0x00).format(),
+		zwave.switchBinaryV1.switchBinaryGet().format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),
+	])
+}
+
+
 def on1() {
+		state.sw1="on"
     	delayBetween([
-		//zwave.switchAllV1.switchAllSet(mode:0).format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:1, parameter:[255]).format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:2, parameter:[0]).format(),
+		zwave.basicV1.basicSet(value: 0x00).format(),
+		zwave.switchBinaryV1.switchBinaryGet().format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
 
 	])
 }
 
 def off1() {
-    	delayBetween([
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:1, parameter:[0]).format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:0, commandClass:0, command:2, parameter:[0]).format(),
+		state.sw1="off"
+        delayBetween([
+		zwave.basicV1.basicSet(value: 0xFF).format(),
+		zwave.switchBinaryV1.switchBinaryGet().format(),
         zwave.multiInstanceV1.multiInstanceGet().format(),
 	])
 }
 
-
-
-def swOn(port) {
-	log.debug "<FONT COLOR=GREEN>Port $port On Digital</FONT>"
-
-	delayBetween([
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:0, command:1, parameter:[255]).format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:0, command:2, parameter:[0]).format(),
-        zwave.multiInstanceV1.multiInstanceGet().format(),
-
-	])
+def on2() {
+	state.sw2="on"
+        sendEvent(name:"switch2", value:"on")
+    if(state?.sw1=="on") {
+        delayBetween([
+		zwave.switchAllV1.switchAllOn().format(),
+		zwave.switchAllV1.switchAllGet().format(),
+		zwave.switchBinaryV1.switchBinaryGet().format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),		
+		])
+    } else {
+        delayBetween([
+		zwave.switchAllV1.switchAllOn().format(),
+		zwave.basicV1.basicSet(value: 0xFF).format(),
+        zwave.switchAllV1.switchAllGet().format(),
+		zwave.switchBinaryV1.switchBinaryGet().format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),		
+		])
+    }
 }
 
-def swOff(port) {
-	log.debug "<FONT COLOR=GREEN>Port $port Off Digital</FONT>"
+def off2() {
+		state.sw2="off"
+        sendEvent(name:"switch2", value:"off")
+   	if(state?.sw1=="off") {
+        delayBetween([
+		zwave.switchAllV1.switchAllOff().format(),
+		zwave.switchAllV1.switchAllGet().format(),
+		zwave.switchBinaryV1.switchBinaryGet().format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),		
+		])
+    } else {
+        delayBetween([
+		zwave.switchAllV1.switchAllOff().format(),
+		zwave.basicV1.basicSet(value: 0x00).format(),
+        zwave.switchAllV1.switchAllGet().format(),
+		zwave.switchBinaryV1.switchBinaryGet().format(),
+        zwave.multiInstanceV1.multiInstanceGet().format(),		
+		])
+    }
 
-	delayBetween([
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:0, command:1, parameter:[0]).format(),
-        zwave.multiInstanceV1.multiInstanceCmdEncap(instance:port, commandClass:0, command:2, parameter:[0]).format(),
-        zwave.multiInstanceV1.multiInstanceGet().format(),
-
-	])
 }
+
+
+
+
+
 
 
 def setLevelX(port, value) {
