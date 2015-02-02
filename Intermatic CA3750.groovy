@@ -280,7 +280,6 @@ def off() {
 
 
 def on1() {
-		state.sw1="on"
     	delayBetween([
 		zwave.basicV1.basicSet(value: 0x00).format(),
 		zwave.switchBinaryV1.switchBinaryGet().format(),
@@ -290,7 +289,6 @@ def on1() {
 }
 
 def off1() {
-		state.sw1="off"
         delayBetween([
 		zwave.basicV1.basicSet(value: 0xFF).format(),
 		zwave.switchBinaryV1.switchBinaryGet().format(),
@@ -299,9 +297,9 @@ def off1() {
 }
 
 def on2() {
-	state.sw2="on"
-        sendEvent(name:"switch2", value:"on")
-    if(state?.sw1=="on") {
+    sw1 = device.currentValue("switch1")
+    sendEvent(name:"switch2", value:"on")
+    if(sw1=="on") {
         delayBetween([
 		zwave.switchAllV1.switchAllOn().format(),
 		zwave.switchAllV1.switchAllGet().format(),
@@ -320,9 +318,9 @@ def on2() {
 }
 
 def off2() {
-		state.sw2="off"
-        sendEvent(name:"switch2", value:"off")
-   	if(state?.sw1=="off") {
+    sw1 = device.currentValue("switch1")
+    sendEvent(name:"switch2", value:"off")
+   	if(sw1=="off") {
         delayBetween([
 		zwave.switchAllV1.switchAllOff().format(),
 		zwave.switchAllV1.switchAllGet().format(),
