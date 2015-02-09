@@ -297,7 +297,7 @@ def off1() {
 }
 
 def on2() {
-    sw1 = device.currentValue("switch1")
+    def sw1 = device.currentValue("switch1")
     sendEvent(name:"switch2", value:"on")
     if(sw1=="on") {
         delayBetween([
@@ -318,7 +318,7 @@ def on2() {
 }
 
 def off2() {
-    sw1 = device.currentValue("switch1")
+    def sw1 = device.currentValue("switch1")
     sendEvent(name:"switch2", value:"off")
    	if(sw1=="off") {
         delayBetween([
